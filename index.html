@@ -43,36 +43,18 @@
             margin-bottom: 10px;
         }
 
-        /* Base letter styles */
         .letter {
             transition: color 0.1s, background-color 0.1s;
             border-radius: 5px;
         }
 
-        /* Keyboard Row Color Coding */
-        .row-top {
-            color: #E53935; /* Red for QWERTY row */
-        }
-        
-        .row-home {
-            color: #4CAF50; /* Green for ASDFG row */
-        }
-        
-        .row-bottom {
-            color: #1E88E5; /* Blue for ZXCVB row */
-        }
+        .row-top { color: #E53935; }
+        .row-home { color: #4CAF50; }
+        .row-bottom { color: #1E88E5; }
 
-        /* State styles */
-        .letter.typed {
-            color: #e0e0e0; /* Fades to light gray once typed */
-        }
+        .letter.typed { color: #e0e0e0; }
+        .letter.error { color: #000; background-color: #ffcdd2; }
 
-        .letter.error {
-            color: #000;
-            background-color: #ffcdd2; /* Red background for a mistake */
-        }
-
-        /* Keyboard Image Container */
         .keyboard-container {
             max-width: 800px;
             width: 100%;
@@ -133,7 +115,6 @@
         const progressDisplay = document.getElementById('progress');
         const completionMessage = document.getElementById('completion-message');
 
-        // Helper function to figure out which row a letter belongs to
         function getKeyboardRowClass(char) {
             const topRow = "qwertyuiop";
             const homeRow = "asdfghjkl";
@@ -143,13 +124,11 @@
             if (topRow.includes(lowerChar)) return 'row-top';
             if (homeRow.includes(lowerChar)) return 'row-home';
             if (bottomRow.includes(lowerChar)) return 'row-bottom';
-            return ''; // Leave spaces or punctuation default
+            return ''; 
         }
 
-        // Function to load a word onto the flashcard
         function loadWord() {
             if (currentWordIndex >= wordList.length) {
-                // User finished all words
                 wordDisplay.style.display = 'none';
                 progressDisplay.style.display = 'none';
                 completionMessage.style.display = 'block';
@@ -158,18 +137,15 @@
 
             const word = wordList[currentWordIndex];
             currentLetterIndex = 0;
-            wordDisplay.innerHTML = ''; // Clear previous word
+            wordDisplay.innerHTML = ''; 
 
-            // Create individual span elements for each letter and assign color
             for (let i = 0; i < word.length; i++) {
                 const char = word[i];
                 const span = document.createElement('span');
                 
-                // Use a non-breaking space for spaces so it renders correctly in HTML
                 span.innerHTML = char === ' ' ? '&nbsp;' : char; 
                 span.classList.add('letter');
                 
-                // Apply the row color
                 const rowClass = getKeyboardRowClass(char);
                 if (rowClass) {
                     span.classList.add(rowClass);
@@ -182,11 +158,41 @@
             progressDisplay.innerText = `Card ${currentWordIndex + 1} of ${wordList.length}`;
         }
 
-        // Listen for keyboard typing (Strict Case-Sensitivity Mode)
         window.addEventListener('keydown', function(event) {
-            // Ignore helper keys on their own, but ALLOW Shift combination keys
             if (event.ctrlKey || event.altKey || event.metaKey || event.key === "Shift") {
                 return;
             }
 
-            // Prevent default scrolling when hit
+            if(event.code === 'Space') {
+                event.preventDefault();
+            }
+
+            if (currentWordIndex >= wordList.length) return;
+
+            const word = wordList[currentWordIndex]; 
+            const expectedLetter = word[currentLetterIndex]; 
+            const typedKey = event.key; 
+
+            const currentSpan = document.getElementById(`letter-${currentLetterIndex}`);
+
+            if (typedKey === expectedLetter) {
+                currentSpan.className = 'letter typed'; 
+                currentLetterIndex++;
+
+                if (currentLetterIndex >= word.length) {
+                    currentWordIndex++;
+                    setTimeout(loadWord, 400); 
+                }
+            } else if (typedKey.length === 1 && typedKey.match(/[a-z0-9\s]/i)) {
+                currentSpan.classList.add('error');
+                setTimeout(() => {
+                    currentSpan.classList.remove('error');
+                }, 300);
+            }
+        });
+
+        // Initialize the first word when the page loads
+        loadWord();
+    </script>
+</body>
+</html>
