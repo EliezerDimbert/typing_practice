@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Practice Flashcards</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .flashcard {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+            border: 4px solid #333;
+        }
+
+        .word-display {
+            font-size: 4rem;
+            letter-spacing: 5px;
+            font-weight: bold;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+
+        /* Base letter styles */
+        .letter {
+            transition: color 0.1s, background-color 0.1s;
+            border-radius: 5px;
+        }
+
+        /* Keyboard Row Color Coding */
+        .row-top {
+            color: #E53935; /* Red for QWERTY row */
+        }
+        
+        .row-home {
+            color: #4CAF50; /* Green for ASDFG row */
+        }
+        
+        .row-bottom {
+            color: #1E88E5; /* Blue for ZXCVB row */
+        }
+
+        /* State styles */
+        .letter.typed {
+            color: #e0e0e0; /* Fades to light gray once typed */
+        }
+
+        .letter.error {
+            color: #000;
+            background-color: #ffcdd2; /* Red background for a mistake */
+        }
+
+        /* Keyboard Image Container */
+        .keyboard-container {
+            max-width: 800px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden; 
+            margin: 0 auto; 
+        }
+
+        .keyboard-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-top: -30%; 
+        }
+
+        .progress {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        #completion-message {
+            display: none;
+            color: #4CAF50;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Shavuot Typing Practice</h1>
+        <p>Type the word on the flashcard. Look closely at the letter colors to find the right row!</p>
+    </div>
+
+    <div class="flashcard">
+        <div class="word-display" id="word-display"></div>
+        <div class="progress" id="progress">Card 1 of X</div>
+        <div id="completion-message">🎉 Great Job! You finished all the words! 🎉</div>
+    </div>
+
+    <div class="keyboard-container">
+        <img src="https://www.k5technologycurriculum.com/wp-content/uploads/h5p/content/587/images/image-5d1bc63b745ee.PNG" alt="Color Coded Keyboard Reference">
+    </div>
+
+    <!-- This links your separate words.js file to the HTML file -->
+    <script src="words.js"></script>
+
+    <!-- Main Game Logic -->
+    <script>
+        let currentWordIndex = 0;
+        let currentLetterIndex = 0;
+
+        const wordDisplay = document.getElementById('word-display');
+        const progressDisplay = document.getElementById('progress');
+        const completionMessage = document.getElementById('completion-message');
+
+        // Helper function to figure out which row a letter belongs to
+        function getKeyboardRowClass(char) {
+            const topRow = "qwertyuiop";
+            const homeRow = "asdfghjkl";
+            const bottomRow = "zxcvbnm";
+            const lowerChar = char.toLowerCase();
+
+            if (topRow.includes(lowerChar)) return 'row-top';
+            if (homeRow.includes(lowerChar)) return 'row-home';
+            if (bottomRow.includes(lowerChar)) return 'row-bottom';
+            return ''; // Leave spaces or punctuation default
+        }
+
+        // Function to load a word onto the flashcard
+        function loadWord() {
+            if (currentWordIndex >= wordList.length) {
+                // User finished all words
+                wordDisplay.style.display = 'none';
+                progressDisplay.style.display = 'none';
+                completionMessage.style.display = 'block';
+                return;
+            }
+
+            const word = wordList[currentWordIndex];
+            currentLetterIndex = 0;
+            wordDisplay.innerHTML = ''; // Clear previous word
+
+            // Create individual span elements for each letter and assign color
+            for (let i = 0; i < word.length; i++) {
+                const char = word[i];
+                const span = document.createElement('span');
+                
+                // Use a non-breaking space for spaces so it renders correctly in HTML
+                span.innerHTML = char === ' ' ? '&nbsp;' : char; 
+                span.classList.add('letter');
+                
+                // Apply the row color
+                const rowClass = getKeyboardRowClass(char);
+                if (rowClass) {
+                    span.classList.add(rowClass);
+                }
+
+                span.id = `letter-${i}`;
+                wordDisplay.appendChild(span);
+            }
+
+            progressDisplay.innerText = `Card ${currentWordIndex + 1} of ${wordList.length}`;
+        }
+
+        // Listen for keyboard typing (Strict Case-Sensitivity Mode)
+        window.addEventListener('keydown', function(event) {
+            // Ignore helper keys on their own, but ALLOW Shift combination keys
+            if (event.ctrlKey || event.altKey || event.metaKey || event.key === "Shift") {
+                return;
+            }
+
+            // Prevent default scrolling when hitting spacebar
+            if(event.code === 'Space') {
+                event.preventDefault();
+            }
+
+            // Stop listening if the game is over
+            if (currentWordIndex >= wordList.length) return;
+
+            const word = wordList[currentWordIndex]; 
+            const expectedLetter = word[currentLetterIndex]; 
+            const typedKey = event.key; 
+
+            const currentSpan = document.getElementById(`letter-${currentLetterIndex}`);
+
+            // STRICT MATCH: Checks exact case (T !== t)
+            if (typedKey === expectedLetter) {
+                currentSpan.className = 'letter typed'; 
+                currentLetterIndex++;
+
+                // Check if the whole word is completed
+                if (currentLetterIndex >= word.length) {
+                    currentWordIndex++;
+                    // Add a tiny delay before switching to the next card
+                    setTimeout(loadWord, 400); 
+                }
+            } else if (typedKey.length === 1 && typedKey.match(/[a-z0-9\s]/i)) {
+                // Incorrect letter typed
+                currentSpan.classList.add('error');
+                
+                // Remove the error color after a short delay
+                setTimeout(() => {
+                    currentSpan.classList.remove('error');
+                }, 300);
+            }
+        });
+
+        // Initialize the first word when the page loads
+        loadWord();
+    </script>
+</body>
+</html>
