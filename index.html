@@ -23,6 +23,19 @@
             color: #333;
         }
 
+        .list-selector {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        select {
+            font-size: 1.1rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
         .flashcard {
             background-color: white;
             border-radius: 15px;
@@ -33,6 +46,7 @@
             max-width: 600px;
             margin-bottom: 30px;
             border: 4px solid #333;
+            min-height: 150px;
         }
 
         .word-display {
@@ -43,152 +57,106 @@
             margin-bottom: 10px;
         }
 
-        /* Base letter styles */
-        .letter {
-            transition: color 0.1s, background-color 0.1s;
-            border-radius: 5px;
-        }
-
-        .row-top { color: #E53935; } /* Red for QWERTY row */
-        .row-home { color: #4CAF50; } /* Green for ASDFG row */
-        .row-bottom { color: #1E88E5; } /* Blue for ZXCVB row */
+        .letter { transition: color 0.1s, background-color 0.1s; border-radius: 5px; }
+        .row-top { color: #E53935; }
+        .row-home { color: #4CAF50; }
+        .row-bottom { color: #1E88E5; }
 
         .letter.typed { color: #e0e0e0; }
-        .letter.error {
-            color: #000;
-            background-color: #ffcdd2;
-        }
+        .letter.error { color: #000; background-color: #ffcdd2; }
 
         .keyboard-container {
-            max-width: 800px;
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            overflow: hidden; 
-            margin: 0 auto; 
+            max-width: 800px; width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; margin: 0 auto; 
         }
 
-        .keyboard-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-            margin-top: -30%; 
-        }
+        .keyboard-container img { width: 100%; height: auto; display: block; margin-top: -30%; }
 
-        .progress {
-            font-size: 1.2rem;
-            color: #666;
-            margin-top: 10px;
-        }
+        .progress { font-size: 1.2rem; color: #666; margin-top: 10px; }
+        #completion-message { display: none; color: #4CAF50; font-size: 2rem; font-weight: bold; margin-top: 20px; }
 
-        #completion-message {
-            display: none;
-            color: #4CAF50;
-            font-size: 2rem;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        /* --- NEW STYLES FOR THE EDITOR --- */
         .edit-btn {
-            margin-top: 20px;
-            padding: 8px 16px;
-            background-color: #ddd;
-            color: #555;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
+            margin-top: 20px; padding: 8px 16px; background-color: #ddd; color: #555;
+            border: none; border-radius: 5px; cursor: pointer; font-size: 0.9rem;
         }
 
-        .edit-btn:hover {
-            background-color: #ccc;
-        }
+        .edit-btn:hover { background-color: #ccc; }
 
+        /* MODAL STYLES */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000;
         }
-
-        .editor-modal {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-
+        .editor-modal { background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; text-align: center; }
         .editor-modal h2 { margin-top: 0; }
-        
         .editor-modal textarea {
-            width: 100%;
-            height: 200px;
-            margin-bottom: 15px;
-            padding: 10px;
-            font-size: 1rem;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            resize: vertical;
+            width: 100%; height: 200px; margin: 15px 0; padding: 10px; font-size: 1.2rem;
+            border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box; resize: vertical;
         }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .btn-save { background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
-        .btn-cancel { background: #E53935; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
-        .btn-reset { background: #1E88E5; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
+        .editor-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-save { background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 2; font-weight: bold;}
+        .btn-cancel { background: #999; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
+        .btn-delete { background: #E53935; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .btn-new { background: #1E88E5; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Shavuot Typing Practice</h1>
+        <h1>Typing Practice</h1>
         <p>Type the word on the flashcard. Look closely at the letter colors to find the right row!</p>
     </div>
 
+    <div class="list-selector">
+        <label>Current List: </label>
+        <select id="main-list-dropdown" onchange="changeList(this.value)">
+            <option>Loading...</option>
+        </select>
+    </div>
+
     <div class="flashcard">
-        <div class="word-display" id="word-display"></div>
-        <div class="progress" id="progress">Card 1 of X</div>
-        <div id="completion-message">🎉 Great Job! You finished all the words! 🎉</div>
+        <div class="word-display" id="word-display">Loading...</div>
+        <div class="progress" id="progress">Please wait</div>
+        <div id="completion-message">🎉 Great Job! You finished the list! 🎉</div>
     </div>
 
     <div class="keyboard-container">
         <img src="https://www.k5technologycurriculum.com/wp-content/uploads/h5p/content/587/images/image-5d1bc63b745ee.PNG" alt="Color Coded Keyboard Reference">
     </div>
 
-    <!-- Edit Button -->
-    <button class="edit-btn" onclick="checkPassword()">⚙️ Edit Words</button>
+    <button class="edit-btn" onclick="checkPassword()">⚙️ Edit Lists (Teacher Only)</button>
 
-    <!-- Editor Modal (Hidden by default) -->
+    <!-- Editor Modal -->
     <div class="modal-overlay" id="editor-modal-overlay">
         <div class="editor-modal">
-            <h2>Edit Words</h2>
-            <p style="font-size: 0.9rem; color: #666;">Put one word per line. Case sensitive!</p>
-            <textarea id="words-input"></textarea>
+            <h2>Edit Word Lists</h2>
+            
+            <div class="editor-controls">
+                <select id="edit-list-dropdown" onchange="loadListToEditor(this.value)"></select>
+                <button class="btn-new" onclick="createNewList()">+ New List</button>
+                <button class="btn-delete" onclick="deleteCurrentList()">🗑️ Delete</button>
+            </div>
+
+            <textarea id="words-input" placeholder="Put one word per line here..."></textarea>
+            
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeEditor()">Cancel</button>
-                <button class="btn-reset" onclick="resetToDefault()">Reset Default</button>
-                <button class="btn-save" onclick="saveWords()">Save</button>
+                <button class="btn-save" id="save-btn" onclick="saveGlobalData()">💾 Save to Server</button>
             </div>
         </div>
     </div>
 
-    <!-- Link to default words -->
-    <script src="words.js"></script>
-
-    <!-- Main Game Logic -->
     <script>
-        let wordList = [];
+        // =========================================================
+        // IMPORTANT: PASTE YOUR JSONBIN CREDENTIALS HERE
+        // =========================================================
+        const BIN_ID = "6a0e84936610dd3ae87d490e";
+        const API_KEY = "$2a$10$LrvH1xR2h8x8fxS8i9waLOelg5qrl94g8l0nwNx89X18Cr9QvsESK";
+        // =========================================================
+
+        let gameData = { lists: {} };
+        let activeWords = [];
         let currentWordIndex = 0;
         let currentLetterIndex = 0;
 
@@ -196,66 +164,46 @@
         const progressDisplay = document.getElementById('progress');
         const completionMessage = document.getElementById('completion-message');
 
-        // --- NEW: Load words from browser memory or default list ---
-        function initializeWords() {
-            const savedWords = localStorage.getItem('customTypingWords');
-            if (savedWords) {
-                wordList = JSON.parse(savedWords);
-            } else {
-                // If nothing is saved locally, use the defaultWordList from words.js
-                wordList = [...defaultWordList]; 
+        // --- FETCH DATA FROM SERVER ON LOAD ---
+        async function fetchGameData() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                const data = await res.json();
+                gameData = data.record;
+                
+                populateDropdowns();
+                const firstList = Object.keys(gameData.lists)[0];
+                changeList(firstList);
+            } catch (e) {
+                wordDisplay.innerHTML = "Error!";
+                progressDisplay.innerHTML = "Could not connect to database.";
+                console.error(e);
             }
         }
 
-        // --- NEW: Password and Editor Functions ---
-        function checkPassword() {
-            const pwd = prompt("Enter the teacher password to edit words:");
-            if (pwd === "Imma is the best") {
-                openEditor();
-            } else if (pwd !== null) {
-                alert("Incorrect password!");
+        function populateDropdowns() {
+            const mainDropdown = document.getElementById('main-list-dropdown');
+            const editDropdown = document.getElementById('edit-list-dropdown');
+            mainDropdown.innerHTML = '';
+            editDropdown.innerHTML = '';
+
+            for (const listName in gameData.lists) {
+                const opt1 = document.createElement('option');
+                opt1.value = listName; opt1.innerText = listName;
+                mainDropdown.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = listName; opt2.innerText = listName;
+                editDropdown.appendChild(opt2);
             }
         }
 
-        function openEditor() {
-            const overlay = document.getElementById('editor-modal-overlay');
-            const textarea = document.getElementById('words-input');
-            
-            // Put current words in the text box, separated by line breaks
-            textarea.value = wordList.join('\n');
-            overlay.style.display = 'flex'; // Show modal
-        }
-
-        function closeEditor() {
-            document.getElementById('editor-modal-overlay').style.display = 'none';
-        }
-
-        function saveWords() {
-            const textarea = document.getElementById('words-input');
-            // Split by lines, remove empty spaces, and remove empty lines
-            const newWords = textarea.value.split('\n').map(word => word.trim()).filter(word => word.length > 0);
-            
-            if (newWords.length === 0) {
-                alert("You need at least one word!");
-                return;
-            }
-
-            // Save to browser memory
-            localStorage.setItem('customTypingWords', JSON.stringify(newWords));
-            
-            closeEditor();
-            restartGame();
-        }
-
-        function resetToDefault() {
-            // Delete custom words from browser memory
-            localStorage.removeItem('customTypingWords');
-            closeEditor();
-            restartGame();
-        }
-
-        function restartGame() {
-            initializeWords();
+        // --- GAMEPLAY LOGIC ---
+        function changeList(listName) {
+            activeWords = gameData.lists[listName];
+            document.getElementById('main-list-dropdown').value = listName;
             currentWordIndex = 0;
             currentLetterIndex = 0;
             wordDisplay.style.display = 'block';
@@ -264,13 +212,9 @@
             loadWord();
         }
 
-        // --- ORIGINAL GAME LOGIC ---
         function getKeyboardRowClass(char) {
-            const topRow = "qwertyuiop";
-            const homeRow = "asdfghjkl";
-            const bottomRow = "zxcvbnm";
+            const topRow = "qwertyuiop"; const homeRow = "asdfghjkl"; const bottomRow = "zxcvbnm";
             const lowerChar = char.toLowerCase();
-
             if (topRow.includes(lowerChar)) return 'row-top';
             if (homeRow.includes(lowerChar)) return 'row-home';
             if (bottomRow.includes(lowerChar)) return 'row-bottom';
@@ -278,14 +222,14 @@
         }
 
         function loadWord() {
-            if (currentWordIndex >= wordList.length) {
+            if (currentWordIndex >= activeWords.length) {
                 wordDisplay.style.display = 'none';
                 progressDisplay.style.display = 'none';
                 completionMessage.style.display = 'block';
                 return;
             }
 
-            const word = wordList[currentWordIndex];
+            const word = activeWords[currentWordIndex];
             currentLetterIndex = 0;
             wordDisplay.innerHTML = ''; 
 
@@ -294,36 +238,28 @@
                 const span = document.createElement('span');
                 span.innerHTML = char === ' ' ? '&nbsp;' : char; 
                 span.classList.add('letter');
-                
                 const rowClass = getKeyboardRowClass(char);
                 if (rowClass) span.classList.add(rowClass);
-
                 span.id = `letter-${i}`;
                 wordDisplay.appendChild(span);
             }
-
-            progressDisplay.innerText = `Card ${currentWordIndex + 1} of ${wordList.length}`;
+            progressDisplay.innerText = `Card ${currentWordIndex + 1} of ${activeWords.length}`;
         }
 
         window.addEventListener('keydown', function(event) {
-            if (document.getElementById('editor-modal-overlay').style.display === 'flex') {
-                return; // Do nothing if the editor window is open
-            }
-
+            if (document.getElementById('editor-modal-overlay').style.display === 'flex') return;
             if (event.ctrlKey || event.altKey || event.metaKey || event.key === "Shift") return;
-            if(event.code === 'Space') event.preventDefault();
-            if (currentWordIndex >= wordList.length) return;
+            if (event.code === 'Space') event.preventDefault();
+            if (currentWordIndex >= activeWords.length) return;
 
-            const word = wordList[currentWordIndex]; 
+            const word = activeWords[currentWordIndex]; 
             const expectedLetter = word[currentLetterIndex]; 
             const typedKey = event.key; 
-
             const currentSpan = document.getElementById(`letter-${currentLetterIndex}`);
 
             if (typedKey === expectedLetter) {
                 currentSpan.className = 'letter typed'; 
                 currentLetterIndex++;
-
                 if (currentLetterIndex >= word.length) {
                     currentWordIndex++;
                     setTimeout(loadWord, 400); 
@@ -334,9 +270,87 @@
             }
         });
 
-        // Initialize lists and start the game!
-        initializeWords();
-        loadWord();
+        // --- EDITOR & SERVER SAVING LOGIC ---
+        function checkPassword() {
+            const pwd = prompt("Enter the teacher password:");
+            if (pwd === "Imma is the best") {
+                document.getElementById('editor-modal-overlay').style.display = 'flex';
+                loadListToEditor(document.getElementById('main-list-dropdown').value);
+            } else if (pwd !== null) {
+                alert("Incorrect password!");
+            }
+        }
+
+        function closeEditor() {
+            document.getElementById('editor-modal-overlay').style.display = 'none';
+        }
+
+        function loadListToEditor(listName) {
+            document.getElementById('edit-list-dropdown').value = listName;
+            const words = gameData.lists[listName];
+            document.getElementById('words-input').value = words.join('\n');
+        }
+
+        function createNewList() {
+            const name = prompt("Name your new word list (e.g., 'Pesach Words'):");
+            if (!name || name.trim() === "") return;
+            if (gameData.lists[name]) {
+                alert("A list with this name already exists!"); return;
+            }
+            gameData.lists[name] = ["Word1", "Word2"];
+            populateDropdowns();
+            loadListToEditor(name);
+        }
+
+        function deleteCurrentList() {
+            const listName = document.getElementById('edit-list-dropdown').value;
+            if (Object.keys(gameData.lists).length <= 1) {
+                alert("You cannot delete the only remaining list!"); return;
+            }
+            if (confirm(`Are you sure you want to permanently delete the list: "${listName}"?`)) {
+                delete gameData.lists[listName];
+                populateDropdowns();
+                loadListToEditor(Object.keys(gameData.lists)[0]);
+            }
+        }
+
+        async function saveGlobalData() {
+            const listName = document.getElementById('edit-list-dropdown').value;
+            const textarea = document.getElementById('words-input');
+            const newWords = textarea.value.split('\n').map(w => w.trim()).filter(w => w.length > 0);
+            
+            if (newWords.length === 0) { alert("A list must have at least one word!"); return; }
+            
+            // Update local state
+            gameData.lists[listName] = newWords;
+
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.innerText = "⏳ Saving...";
+            saveBtn.disabled = true;
+
+            try {
+                // Send changes to global database
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                    body: JSON.stringify(gameData)
+                });
+                
+                alert("Saved! Everyone visiting the website will now see these lists.");
+                closeEditor();
+                populateDropdowns();
+                changeList(listName); 
+            } catch (e) {
+                alert("There was an error saving to the server.");
+                console.error(e);
+            } finally {
+                saveBtn.innerText = "💾 Save to Server";
+                saveBtn.disabled = false;
+            }
+        }
+
+        // Start game on load
+        fetchGameData();
     </script>
 </body>
 </html>
