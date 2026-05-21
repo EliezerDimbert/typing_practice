@@ -49,30 +49,16 @@
             border-radius: 5px;
         }
 
-        /* Keyboard Row Color Coding */
-        .row-top {
-            color: #E53935; /* Red for QWERTY row */
-        }
-        
-        .row-home {
-            color: #4CAF50; /* Green for ASDFG row */
-        }
-        
-        .row-bottom {
-            color: #1E88E5; /* Blue for ZXCVB row */
-        }
+        .row-top { color: #E53935; } /* Red for QWERTY row */
+        .row-home { color: #4CAF50; } /* Green for ASDFG row */
+        .row-bottom { color: #1E88E5; } /* Blue for ZXCVB row */
 
-        /* State styles */
-        .letter.typed {
-            color: #e0e0e0; /* Fades to light gray once typed */
-        }
-
+        .letter.typed { color: #e0e0e0; }
         .letter.error {
             color: #000;
-            background-color: #ffcdd2; /* Red background for a mistake */
+            background-color: #ffcdd2;
         }
 
-        /* Keyboard Image Container */
         .keyboard-container {
             max-width: 800px;
             width: 100%;
@@ -102,6 +88,65 @@
             font-weight: bold;
             margin-top: 20px;
         }
+
+        /* --- NEW STYLES FOR THE EDITOR --- */
+        .edit-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #ddd;
+            color: #555;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn:hover {
+            background-color: #ccc;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .editor-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .editor-modal h2 { margin-top: 0; }
+        
+        .editor-modal textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .btn-save { background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
+        .btn-cancel { background: #E53935; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
+        .btn-reset { background: #1E88E5; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
     </style>
 </head>
 <body>
@@ -121,11 +166,29 @@
         <img src="https://www.k5technologycurriculum.com/wp-content/uploads/h5p/content/587/images/image-5d1bc63b745ee.PNG" alt="Color Coded Keyboard Reference">
     </div>
 
-    <!-- This links your separate words.js file to the HTML file -->
+    <!-- Edit Button -->
+    <button class="edit-btn" onclick="checkPassword()">⚙️ Edit Words</button>
+
+    <!-- Editor Modal (Hidden by default) -->
+    <div class="modal-overlay" id="editor-modal-overlay">
+        <div class="editor-modal">
+            <h2>Edit Words</h2>
+            <p style="font-size: 0.9rem; color: #666;">Put one word per line. Case sensitive!</p>
+            <textarea id="words-input"></textarea>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeEditor()">Cancel</button>
+                <button class="btn-reset" onclick="resetToDefault()">Reset Default</button>
+                <button class="btn-save" onclick="saveWords()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to default words -->
     <script src="words.js"></script>
 
     <!-- Main Game Logic -->
     <script>
+        let wordList = [];
         let currentWordIndex = 0;
         let currentLetterIndex = 0;
 
@@ -133,7 +196,75 @@
         const progressDisplay = document.getElementById('progress');
         const completionMessage = document.getElementById('completion-message');
 
-        // Helper function to figure out which row a letter belongs to
+        // --- NEW: Load words from browser memory or default list ---
+        function initializeWords() {
+            const savedWords = localStorage.getItem('customTypingWords');
+            if (savedWords) {
+                wordList = JSON.parse(savedWords);
+            } else {
+                // If nothing is saved locally, use the defaultWordList from words.js
+                wordList = [...defaultWordList]; 
+            }
+        }
+
+        // --- NEW: Password and Editor Functions ---
+        function checkPassword() {
+            const pwd = prompt("Enter the teacher password to edit words:");
+            if (pwd === "Imma is the best") {
+                openEditor();
+            } else if (pwd !== null) {
+                alert("Incorrect password!");
+            }
+        }
+
+        function openEditor() {
+            const overlay = document.getElementById('editor-modal-overlay');
+            const textarea = document.getElementById('words-input');
+            
+            // Put current words in the text box, separated by line breaks
+            textarea.value = wordList.join('\n');
+            overlay.style.display = 'flex'; // Show modal
+        }
+
+        function closeEditor() {
+            document.getElementById('editor-modal-overlay').style.display = 'none';
+        }
+
+        function saveWords() {
+            const textarea = document.getElementById('words-input');
+            // Split by lines, remove empty spaces, and remove empty lines
+            const newWords = textarea.value.split('\n').map(word => word.trim()).filter(word => word.length > 0);
+            
+            if (newWords.length === 0) {
+                alert("You need at least one word!");
+                return;
+            }
+
+            // Save to browser memory
+            localStorage.setItem('customTypingWords', JSON.stringify(newWords));
+            
+            closeEditor();
+            restartGame();
+        }
+
+        function resetToDefault() {
+            // Delete custom words from browser memory
+            localStorage.removeItem('customTypingWords');
+            closeEditor();
+            restartGame();
+        }
+
+        function restartGame() {
+            initializeWords();
+            currentWordIndex = 0;
+            currentLetterIndex = 0;
+            wordDisplay.style.display = 'block';
+            progressDisplay.style.display = 'block';
+            completionMessage.style.display = 'none';
+            loadWord();
+        }
+
+        // --- ORIGINAL GAME LOGIC ---
         function getKeyboardRowClass(char) {
             const topRow = "qwertyuiop";
             const homeRow = "asdfghjkl";
@@ -143,13 +274,11 @@
             if (topRow.includes(lowerChar)) return 'row-top';
             if (homeRow.includes(lowerChar)) return 'row-home';
             if (bottomRow.includes(lowerChar)) return 'row-bottom';
-            return ''; // Leave spaces or punctuation default
+            return ''; 
         }
 
-        // Function to load a word onto the flashcard
         function loadWord() {
             if (currentWordIndex >= wordList.length) {
-                // User finished all words
                 wordDisplay.style.display = 'none';
                 progressDisplay.style.display = 'none';
                 completionMessage.style.display = 'block';
@@ -158,22 +287,16 @@
 
             const word = wordList[currentWordIndex];
             currentLetterIndex = 0;
-            wordDisplay.innerHTML = ''; // Clear previous word
+            wordDisplay.innerHTML = ''; 
 
-            // Create individual span elements for each letter and assign color
             for (let i = 0; i < word.length; i++) {
                 const char = word[i];
                 const span = document.createElement('span');
-                
-                // Use a non-breaking space for spaces so it renders correctly in HTML
                 span.innerHTML = char === ' ' ? '&nbsp;' : char; 
                 span.classList.add('letter');
                 
-                // Apply the row color
                 const rowClass = getKeyboardRowClass(char);
-                if (rowClass) {
-                    span.classList.add(rowClass);
-                }
+                if (rowClass) span.classList.add(rowClass);
 
                 span.id = `letter-${i}`;
                 wordDisplay.appendChild(span);
@@ -182,19 +305,13 @@
             progressDisplay.innerText = `Card ${currentWordIndex + 1} of ${wordList.length}`;
         }
 
-        // Listen for keyboard typing (Strict Case-Sensitivity Mode)
         window.addEventListener('keydown', function(event) {
-            // Ignore helper keys on their own, but ALLOW Shift combination keys
-            if (event.ctrlKey || event.altKey || event.metaKey || event.key === "Shift") {
-                return;
+            if (document.getElementById('editor-modal-overlay').style.display === 'flex') {
+                return; // Do nothing if the editor window is open
             }
 
-            // Prevent default scrolling when hitting spacebar
-            if(event.code === 'Space') {
-                event.preventDefault();
-            }
-
-            // Stop listening if the game is over
+            if (event.ctrlKey || event.altKey || event.metaKey || event.key === "Shift") return;
+            if(event.code === 'Space') event.preventDefault();
             if (currentWordIndex >= wordList.length) return;
 
             const word = wordList[currentWordIndex]; 
@@ -203,29 +320,22 @@
 
             const currentSpan = document.getElementById(`letter-${currentLetterIndex}`);
 
-            // STRICT MATCH: Checks exact case (T !== t)
             if (typedKey === expectedLetter) {
                 currentSpan.className = 'letter typed'; 
                 currentLetterIndex++;
 
-                // Check if the whole word is completed
                 if (currentLetterIndex >= word.length) {
                     currentWordIndex++;
-                    // Add a tiny delay before switching to the next card
                     setTimeout(loadWord, 400); 
                 }
             } else if (typedKey.length === 1 && typedKey.match(/[a-z0-9\s]/i)) {
-                // Incorrect letter typed
                 currentSpan.classList.add('error');
-                
-                // Remove the error color after a short delay
-                setTimeout(() => {
-                    currentSpan.classList.remove('error');
-                }, 300);
+                setTimeout(() => currentSpan.classList.remove('error'), 300);
             }
         });
 
-        // Initialize the first word when the page loads
+        // Initialize lists and start the game!
+        initializeWords();
         loadWord();
     </script>
 </body>
