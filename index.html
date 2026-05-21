@@ -19,24 +19,8 @@
 
         .header {
             text-align: center;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .active-list-title {
-            font-size: 1.5rem;
-            color: #1E88E5;
             margin-bottom: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        select {
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
+            color: #333;
         }
 
         .flashcard {
@@ -49,7 +33,6 @@
             max-width: 600px;
             margin-bottom: 30px;
             border: 4px solid #333;
-            min-height: 150px;
         }
 
         .word-display {
@@ -60,60 +43,65 @@
             margin-bottom: 10px;
         }
 
-        .letter { transition: color 0.1s, background-color 0.1s; border-radius: 5px; }
-        .row-top { color: #E53935; }
-        .row-home { color: #4CAF50; }
-        .row-bottom { color: #1E88E5; }
+        /* Base letter styles */
+        .letter {
+            transition: color 0.1s, background-color 0.1s;
+            border-radius: 5px;
+        }
 
-        .letter.typed { color: #e0e0e0; }
-        .letter.error { color: #000; background-color: #ffcdd2; }
+        /* Keyboard Row Color Coding */
+        .row-top {
+            color: #E53935; /* Red for QWERTY row */
+        }
+        
+        .row-home {
+            color: #4CAF50; /* Green for ASDFG row */
+        }
+        
+        .row-bottom {
+            color: #1E88E5; /* Blue for ZXCVB row */
+        }
 
+        /* State styles */
+        .letter.typed {
+            color: #e0e0e0; /* Fades to light gray once typed */
+        }
+
+        .letter.error {
+            color: #000;
+            background-color: #ffcdd2; /* Red background for a mistake */
+        }
+
+        /* Keyboard Image Container */
         .keyboard-container {
-            max-width: 800px; width: 100%; border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; margin: 0 auto; 
+            max-width: 800px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden; 
+            margin: 0 auto; 
         }
 
-        .keyboard-container img { width: 100%; height: auto; display: block; margin-top: -30%; }
-
-        .progress { font-size: 1.2rem; color: #666; margin-top: 10px; }
-        #completion-message { display: none; color: #4CAF50; font-size: 2rem; font-weight: bold; margin-top: 20px; }
-
-        .edit-btn {
-            margin-top: 20px; padding: 8px 16px; background-color: #ddd; color: #555;
-            border: none; border-radius: 5px; cursor: pointer; font-size: 0.9rem;
+        .keyboard-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-top: -30%; 
         }
 
-        .edit-btn:hover { background-color: #ccc; }
-
-        /* MODAL STYLES */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000;
-        }
-        .editor-modal { background: #f9f9f9; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; text-align: left; }
-        .editor-modal h2 { margin-top: 0; text-align: center; }
-        
-        .active-settings {
-            background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bbdefb;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .active-settings label { font-weight: bold; color: #1565c0; }
-
-        .edit-settings {
-            background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;
+        .progress {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: 10px;
         }
 
-        .editor-modal textarea {
-            width: 100%; height: 150px; margin: 15px 0 0 0; padding: 10px; font-size: 1.2rem;
-            border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box; resize: vertical;
+        #completion-message {
+            display: none;
+            color: #4CAF50;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 20px;
         }
-        .editor-controls { display: flex; justify-content: space-between; align-items: center; }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
-        
-        .btn-save { background: #4CAF50; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; flex: 2; font-weight: bold; font-size: 1.1rem;}
-        .btn-cancel { background: #999; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 1.1rem;}
-        .btn-delete { background: #E53935; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-        .btn-new { background: #1E88E5; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -123,62 +111,21 @@
         <p>Type the word on the flashcard. Look closely at the letter colors to find the right row!</p>
     </div>
 
-    <!-- This title replaces the dropdown for students -->
-    <div class="active-list-title" id="current-list-title">Loading List...</div>
-
     <div class="flashcard">
-        <div class="word-display" id="word-display">Loading...</div>
-        <div class="progress" id="progress">Please wait</div>
-        <div id="completion-message">🎉 Great Job! You finished the list! 🎉</div>
+        <div class="word-display" id="word-display"></div>
+        <div class="progress" id="progress">Card 1 of X</div>
+        <div id="completion-message">🎉 Great Job! You finished all the words! 🎉</div>
     </div>
 
     <div class="keyboard-container">
         <img src="https://www.k5technologycurriculum.com/wp-content/uploads/h5p/content/587/images/image-5d1bc63b745ee.PNG" alt="Color Coded Keyboard Reference">
     </div>
 
-    <button class="edit-btn" onclick="checkPassword()">⚙️ Edit Lists (Teacher Only)</button>
+    <!-- This links your separate words.js file to the HTML file -->
+    <script src="words.js"></script>
 
-    <!-- Editor Modal -->
-    <div class="modal-overlay" id="editor-modal-overlay">
-        <div class="editor-modal">
-            <h2>Teacher Dashboard</h2>
-            
-            <!-- Area to choose what list everyone plays -->
-            <div class="active-settings">
-                <label>Active List for Students:</label>
-                <select id="active-list-dropdown"></select>
-            </div>
-
-            <!-- Area to edit the words -->
-            <div class="edit-settings">
-                <div class="editor-controls">
-                    <select id="edit-list-dropdown" onchange="loadListToEditor(this.value)"></select>
-                    <div>
-                        <button class="btn-new" onclick="createNewList()">+ New List</button>
-                        <button class="btn-delete" onclick="deleteCurrentList()">🗑️ Delete</button>
-                    </div>
-                </div>
-                <!-- oninput="updateMemory()" ensures if you switch lists, it doesn't forget what you typed -->
-                <textarea id="words-input" oninput="updateMemory()" placeholder="Put one word per line here..."></textarea>
-            </div>
-            
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeEditor()">Cancel</button>
-                <button class="btn-save" id="save-btn" onclick="saveGlobalData()">💾 Save to Server</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- Main Game Logic -->
     <script>
-        // =========================================================
-        // IMPORTANT: PASTE YOUR JSONBIN CREDENTIALS HERE
-        // =========================================================
-        const BIN_ID = "6a0e863a6877513b27a8c5cb";
-        const API_KEY = "$2a$10$LrvH1xR2h8x8fxS8i9waLOelg5qrl94g8l0nwNx89X18Cr9QvsESK";
-        // =========================================================
-
-        let gameData = { activeListName: "", lists: {} };
-        let activeWords = [];
         let currentWordIndex = 0;
         let currentLetterIndex = 0;
 
@@ -186,215 +133,60 @@
         const progressDisplay = document.getElementById('progress');
         const completionMessage = document.getElementById('completion-message');
 
-        // --- FETCH DATA FROM SERVER ON LOAD ---
-        async function fetchGameData() {
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-                const data = await res.json();
-                
-                // Fallback in case activeListName is missing
-                gameData = data.record;
-                if (!gameData.activeListName || !gameData.lists[gameData.activeListName]) {
-                    gameData.activeListName = Object.keys(gameData.lists)[0];
-                }
-                
-                populateDropdowns();
-                startGameWithList(gameData.activeListName);
-            } catch (e) {
-                document.getElementById('current-list-title').innerHTML = "Connection Error";
-                wordDisplay.innerHTML = "Error!";
-                progressDisplay.innerHTML = "Could not connect to database.";
-                console.error(e);
-            }
-        }
-
-        function populateDropdowns() {
-            const activeDropdown = document.getElementById('active-list-dropdown');
-            const editDropdown = document.getElementById('edit-list-dropdown');
-            
-            activeDropdown.innerHTML = '';
-            editDropdown.innerHTML = '';
-
-            for (const listName in gameData.lists) {
-                const opt1 = document.createElement('option');
-                opt1.value = listName; opt1.innerText = listName;
-                activeDropdown.appendChild(opt1);
-
-                const opt2 = document.createElement('option');
-                opt2.value = listName; opt2.innerText = listName;
-                editDropdown.appendChild(opt2);
-            }
-
-            activeDropdown.value = gameData.activeListName;
-        }
-
-        // --- GAMEPLAY LOGIC ---
-        function startGameWithList(listName) {
-            document.getElementById('current-list-title').innerText = listName;
-            activeWords = gameData.lists[listName];
-            currentWordIndex = 0;
-            currentLetterIndex = 0;
-            wordDisplay.style.display = 'block';
-            progressDisplay.style.display = 'block';
-            completionMessage.style.display = 'none';
-            loadWord();
-        }
-
+        // Helper function to figure out which row a letter belongs to
         function getKeyboardRowClass(char) {
-            const topRow = "qwertyuiop"; const homeRow = "asdfghjkl"; const bottomRow = "zxcvbnm";
+            const topRow = "qwertyuiop";
+            const homeRow = "asdfghjkl";
+            const bottomRow = "zxcvbnm";
             const lowerChar = char.toLowerCase();
+
             if (topRow.includes(lowerChar)) return 'row-top';
             if (homeRow.includes(lowerChar)) return 'row-home';
             if (bottomRow.includes(lowerChar)) return 'row-bottom';
-            return ''; 
+            return ''; // Leave spaces or punctuation default
         }
 
+        // Function to load a word onto the flashcard
         function loadWord() {
-            if (currentWordIndex >= activeWords.length) {
+            if (currentWordIndex >= wordList.length) {
+                // User finished all words
                 wordDisplay.style.display = 'none';
                 progressDisplay.style.display = 'none';
                 completionMessage.style.display = 'block';
                 return;
             }
 
-            const word = activeWords[currentWordIndex];
+            const word = wordList[currentWordIndex];
             currentLetterIndex = 0;
-            wordDisplay.innerHTML = ''; 
+            wordDisplay.innerHTML = ''; // Clear previous word
 
+            // Create individual span elements for each letter and assign color
             for (let i = 0; i < word.length; i++) {
                 const char = word[i];
                 const span = document.createElement('span');
+                
+                // Use a non-breaking space for spaces so it renders correctly in HTML
                 span.innerHTML = char === ' ' ? '&nbsp;' : char; 
                 span.classList.add('letter');
+                
+                // Apply the row color
                 const rowClass = getKeyboardRowClass(char);
-                if (rowClass) span.classList.add(rowClass);
+                if (rowClass) {
+                    span.classList.add(rowClass);
+                }
+
                 span.id = `letter-${i}`;
                 wordDisplay.appendChild(span);
             }
-            progressDisplay.innerText = `Card ${currentWordIndex + 1} of ${activeWords.length}`;
+
+            progressDisplay.innerText = `Card ${currentWordIndex + 1} of ${wordList.length}`;
         }
 
+        // Listen for keyboard typing (Strict Case-Sensitivity Mode)
         window.addEventListener('keydown', function(event) {
-            if (document.getElementById('editor-modal-overlay').style.display === 'flex') return;
-            if (event.ctrlKey || event.altKey || event.metaKey || event.key === "Shift") return;
-            if (event.code === 'Space') event.preventDefault();
-            if (currentWordIndex >= activeWords.length) return;
-
-            const word = activeWords[currentWordIndex]; 
-            const expectedLetter = word[currentLetterIndex]; 
-            const typedKey = event.key; 
-            const currentSpan = document.getElementById(`letter-${currentLetterIndex}`);
-
-            if (typedKey === expectedLetter) {
-                currentSpan.className = 'letter typed'; 
-                currentLetterIndex++;
-                if (currentLetterIndex >= word.length) {
-                    currentWordIndex++;
-                    setTimeout(loadWord, 400); 
-                }
-            } else if (typedKey.length === 1 && typedKey.match(/[a-z0-9\s]/i)) {
-                currentSpan.classList.add('error');
-                setTimeout(() => currentSpan.classList.remove('error'), 300);
+            // Ignore helper keys on their own, but ALLOW Shift combination keys
+            if (event.ctrlKey || event.altKey || event.metaKey || event.key === "Shift") {
+                return;
             }
-        });
 
-        // --- EDITOR & SERVER SAVING LOGIC ---
-        function checkPassword() {
-            const pwd = prompt("Enter the teacher password:");
-            if (pwd === "Imma is the best") {
-                document.getElementById('editor-modal-overlay').style.display = 'flex';
-                // Always reset editor view to whatever the active list is when opened
-                loadListToEditor(gameData.activeListName);
-            } else if (pwd !== null) {
-                alert("Incorrect password!");
-            }
-        }
-
-        function closeEditor() {
-            document.getElementById('editor-modal-overlay').style.display = 'none';
-            // Re-fetch data just in case they cancelled without saving changes they typed
-            fetchGameData();
-        }
-
-        function loadListToEditor(listName) {
-            document.getElementById('edit-list-dropdown').value = listName;
-            const words = gameData.lists[listName];
-            document.getElementById('words-input').value = words.join('\n');
-        }
-
-        // Saves typed words to temporary memory so you don't lose them if you switch tabs in the editor
-        function updateMemory() {
-            const currentEditList = document.getElementById('edit-list-dropdown').value;
-            const textarea = document.getElementById('words-input');
-            const newWords = textarea.value.split('\n').map(w => w.trim()).filter(w => w.length > 0);
-            if(newWords.length > 0) {
-                gameData.lists[currentEditList] = newWords;
-            }
-        }
-
-        function createNewList() {
-            const name = prompt("Name your new word list (e.g., 'Pesach Words'):");
-            if (!name || name.trim() === "") return;
-            if (gameData.lists[name]) {
-                alert("A list with this name already exists!"); return;
-            }
-            gameData.lists[name] = ["Word1", "Word2"];
-            populateDropdowns();
-            loadListToEditor(name);
-        }
-
-        function deleteCurrentList() {
-            const listName = document.getElementById('edit-list-dropdown').value;
-            if (Object.keys(gameData.lists).length <= 1) {
-                alert("You cannot delete the only remaining list!"); return;
-            }
-            if (confirm(`Are you sure you want to permanently delete the list: "${listName}"?`)) {
-                delete gameData.lists[listName];
-                // Failsafe: if we deleted the currently active list, switch it to another list
-                if (gameData.activeListName === listName) {
-                    gameData.activeListName = Object.keys(gameData.lists)[0];
-                }
-                populateDropdowns();
-                loadListToEditor(Object.keys(gameData.lists)[0]);
-            }
-        }
-
-        async function saveGlobalData() {
-            // Ensure the very last thing typed is saved to temporary memory
-            updateMemory();
-
-            // Set the active list to whatever is selected in the blue dropdown box
-            gameData.activeListName = document.getElementById('active-list-dropdown').value;
-
-            const saveBtn = document.getElementById('save-btn');
-            saveBtn.innerText = "⏳ Saving...";
-            saveBtn.disabled = true;
-
-            try {
-                // Send changes to global database
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-                    body: JSON.stringify(gameData)
-                });
-                
-                alert("Saved! Everyone visiting the website will now play the Active list.");
-                document.getElementById('editor-modal-overlay').style.display = 'none';
-                populateDropdowns();
-                startGameWithList(gameData.activeListName); 
-            } catch (e) {
-                alert("There was an error saving to the server.");
-                console.error(e);
-            } finally {
-                saveBtn.innerText = "💾 Save to Server";
-                saveBtn.disabled = false;
-            }
-        }
-
-        // Start game on load
-        fetchGameData();
-    </script>
-</body>
-</html>
+            // Prevent default scrolling when hit
