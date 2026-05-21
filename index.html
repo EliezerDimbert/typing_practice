@@ -19,18 +19,21 @@
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #333;
         }
 
-        .list-selector {
+        .active-list-title {
+            font-size: 1.5rem;
+            color: #1E88E5;
             margin-bottom: 20px;
-            font-size: 1.2rem;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         select {
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
@@ -87,16 +90,28 @@
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000;
         }
-        .editor-modal { background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; text-align: center; }
-        .editor-modal h2 { margin-top: 0; }
+        .editor-modal { background: #f9f9f9; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; text-align: left; }
+        .editor-modal h2 { margin-top: 0; text-align: center; }
+        
+        .active-settings {
+            background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bbdefb;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .active-settings label { font-weight: bold; color: #1565c0; }
+
+        .edit-settings {
+            background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;
+        }
+
         .editor-modal textarea {
-            width: 100%; height: 200px; margin: 15px 0; padding: 10px; font-size: 1.2rem;
+            width: 100%; height: 150px; margin: 15px 0 0 0; padding: 10px; font-size: 1.2rem;
             border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box; resize: vertical;
         }
-        .editor-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-save { background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 2; font-weight: bold;}
-        .btn-cancel { background: #999; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
+        .editor-controls { display: flex; justify-content: space-between; align-items: center; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        
+        .btn-save { background: #4CAF50; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; flex: 2; font-weight: bold; font-size: 1.1rem;}
+        .btn-cancel { background: #999; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 1.1rem;}
         .btn-delete { background: #E53935; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
         .btn-new { background: #1E88E5; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
@@ -108,12 +123,8 @@
         <p>Type the word on the flashcard. Look closely at the letter colors to find the right row!</p>
     </div>
 
-    <div class="list-selector">
-        <label>Current List: </label>
-        <select id="main-list-dropdown" onchange="changeList(this.value)">
-            <option>Loading...</option>
-        </select>
-    </div>
+    <!-- This title replaces the dropdown for students -->
+    <div class="active-list-title" id="current-list-title">Loading List...</div>
 
     <div class="flashcard">
         <div class="word-display" id="word-display">Loading...</div>
@@ -130,15 +141,26 @@
     <!-- Editor Modal -->
     <div class="modal-overlay" id="editor-modal-overlay">
         <div class="editor-modal">
-            <h2>Edit Word Lists</h2>
+            <h2>Teacher Dashboard</h2>
             
-            <div class="editor-controls">
-                <select id="edit-list-dropdown" onchange="loadListToEditor(this.value)"></select>
-                <button class="btn-new" onclick="createNewList()">+ New List</button>
-                <button class="btn-delete" onclick="deleteCurrentList()">🗑️ Delete</button>
+            <!-- Area to choose what list everyone plays -->
+            <div class="active-settings">
+                <label>Active List for Students:</label>
+                <select id="active-list-dropdown"></select>
             </div>
 
-            <textarea id="words-input" placeholder="Put one word per line here..."></textarea>
+            <!-- Area to edit the words -->
+            <div class="edit-settings">
+                <div class="editor-controls">
+                    <select id="edit-list-dropdown" onchange="loadListToEditor(this.value)"></select>
+                    <div>
+                        <button class="btn-new" onclick="createNewList()">+ New List</button>
+                        <button class="btn-delete" onclick="deleteCurrentList()">🗑️ Delete</button>
+                    </div>
+                </div>
+                <!-- oninput="updateMemory()" ensures if you switch lists, it doesn't forget what you typed -->
+                <textarea id="words-input" oninput="updateMemory()" placeholder="Put one word per line here..."></textarea>
+            </div>
             
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeEditor()">Cancel</button>
@@ -151,11 +173,11 @@
         // =========================================================
         // IMPORTANT: PASTE YOUR JSONBIN CREDENTIALS HERE
         // =========================================================
-        const BIN_ID = "6a0e84936610dd3ae87d490e";
-        const API_KEY = "$2a$10$LrvH1xR2h8x8fxS8i9waLOelg5qrl94g8l0nwNx89X18Cr9QvsESK";
+        const BIN_ID = "YOUR_BIN_ID_HERE";
+        const API_KEY = "YOUR_API_KEY_HERE";
         // =========================================================
 
-        let gameData = { lists: {} };
+        let gameData = { activeListName: "", lists: {} };
         let activeWords = [];
         let currentWordIndex = 0;
         let currentLetterIndex = 0;
@@ -171,12 +193,17 @@
                     headers: { 'X-Master-Key': API_KEY }
                 });
                 const data = await res.json();
+                
+                // Fallback in case activeListName is missing
                 gameData = data.record;
+                if (!gameData.activeListName || !gameData.lists[gameData.activeListName]) {
+                    gameData.activeListName = Object.keys(gameData.lists)[0];
+                }
                 
                 populateDropdowns();
-                const firstList = Object.keys(gameData.lists)[0];
-                changeList(firstList);
+                startGameWithList(gameData.activeListName);
             } catch (e) {
+                document.getElementById('current-list-title').innerHTML = "Connection Error";
                 wordDisplay.innerHTML = "Error!";
                 progressDisplay.innerHTML = "Could not connect to database.";
                 console.error(e);
@@ -184,26 +211,29 @@
         }
 
         function populateDropdowns() {
-            const mainDropdown = document.getElementById('main-list-dropdown');
+            const activeDropdown = document.getElementById('active-list-dropdown');
             const editDropdown = document.getElementById('edit-list-dropdown');
-            mainDropdown.innerHTML = '';
+            
+            activeDropdown.innerHTML = '';
             editDropdown.innerHTML = '';
 
             for (const listName in gameData.lists) {
                 const opt1 = document.createElement('option');
                 opt1.value = listName; opt1.innerText = listName;
-                mainDropdown.appendChild(opt1);
+                activeDropdown.appendChild(opt1);
 
                 const opt2 = document.createElement('option');
                 opt2.value = listName; opt2.innerText = listName;
                 editDropdown.appendChild(opt2);
             }
+
+            activeDropdown.value = gameData.activeListName;
         }
 
         // --- GAMEPLAY LOGIC ---
-        function changeList(listName) {
+        function startGameWithList(listName) {
+            document.getElementById('current-list-title').innerText = listName;
             activeWords = gameData.lists[listName];
-            document.getElementById('main-list-dropdown').value = listName;
             currentWordIndex = 0;
             currentLetterIndex = 0;
             wordDisplay.style.display = 'block';
@@ -275,7 +305,8 @@
             const pwd = prompt("Enter the teacher password:");
             if (pwd === "Imma is the best") {
                 document.getElementById('editor-modal-overlay').style.display = 'flex';
-                loadListToEditor(document.getElementById('main-list-dropdown').value);
+                // Always reset editor view to whatever the active list is when opened
+                loadListToEditor(gameData.activeListName);
             } else if (pwd !== null) {
                 alert("Incorrect password!");
             }
@@ -283,12 +314,24 @@
 
         function closeEditor() {
             document.getElementById('editor-modal-overlay').style.display = 'none';
+            // Re-fetch data just in case they cancelled without saving changes they typed
+            fetchGameData();
         }
 
         function loadListToEditor(listName) {
             document.getElementById('edit-list-dropdown').value = listName;
             const words = gameData.lists[listName];
             document.getElementById('words-input').value = words.join('\n');
+        }
+
+        // Saves typed words to temporary memory so you don't lose them if you switch tabs in the editor
+        function updateMemory() {
+            const currentEditList = document.getElementById('edit-list-dropdown').value;
+            const textarea = document.getElementById('words-input');
+            const newWords = textarea.value.split('\n').map(w => w.trim()).filter(w => w.length > 0);
+            if(newWords.length > 0) {
+                gameData.lists[currentEditList] = newWords;
+            }
         }
 
         function createNewList() {
@@ -309,20 +352,21 @@
             }
             if (confirm(`Are you sure you want to permanently delete the list: "${listName}"?`)) {
                 delete gameData.lists[listName];
+                // Failsafe: if we deleted the currently active list, switch it to another list
+                if (gameData.activeListName === listName) {
+                    gameData.activeListName = Object.keys(gameData.lists)[0];
+                }
                 populateDropdowns();
                 loadListToEditor(Object.keys(gameData.lists)[0]);
             }
         }
 
         async function saveGlobalData() {
-            const listName = document.getElementById('edit-list-dropdown').value;
-            const textarea = document.getElementById('words-input');
-            const newWords = textarea.value.split('\n').map(w => w.trim()).filter(w => w.length > 0);
-            
-            if (newWords.length === 0) { alert("A list must have at least one word!"); return; }
-            
-            // Update local state
-            gameData.lists[listName] = newWords;
+            // Ensure the very last thing typed is saved to temporary memory
+            updateMemory();
+
+            // Set the active list to whatever is selected in the blue dropdown box
+            gameData.activeListName = document.getElementById('active-list-dropdown').value;
 
             const saveBtn = document.getElementById('save-btn');
             saveBtn.innerText = "⏳ Saving...";
@@ -336,10 +380,10 @@
                     body: JSON.stringify(gameData)
                 });
                 
-                alert("Saved! Everyone visiting the website will now see these lists.");
-                closeEditor();
+                alert("Saved! Everyone visiting the website will now play the Active list.");
+                document.getElementById('editor-modal-overlay').style.display = 'none';
                 populateDropdowns();
-                changeList(listName); 
+                startGameWithList(gameData.activeListName); 
             } catch (e) {
                 alert("There was an error saving to the server.");
                 console.error(e);
